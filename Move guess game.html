@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Quiz Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    /* style.css */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f8ff;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+#game-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 2px solid #0077ff;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #0077ff;
+}
+
+#options {
+  list-style-type: none;
+  padding: 0;
+}
+
+#options li {
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #e8f4ff;
+  border: 1px solid #0077ff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#options li:hover {
+  background-color: #0077ff;
+  color: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background-color: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #005bb5;
+}
+
+</style>
+<body>
+  <div id="game-container">
+    <h1>Movie Quiz Game</h1>
+    <div id="quiz-section">
+      <p id="question"></p>
+      <ul id="options"></ul>
+    </div>
+    <div id="stats">
+      <p>Attempts: <span id="attempts">0</span></p>
+      <p>Correct: <span id="correct">0</span></p>
+      <p>Wrong: <span id="wrong">0</span></p>
+    </div>
+    <div id="crown" class="hidden">
+      🎉 Congratulations! You are crowned as the Quiz Master! 👑
+    </div>
+    <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+</div>
+  <script>
+   // Quiz questions and answers
+const questions = [
+  {
+    question: "In which movie did Shah Rukh Khan play the character (Rahul Mehra) a stalker obsessed with Kiran?",
+    options: ["Dilwale", "Channai Express", "Darr", "Baazigar"],
+    answer: "Darr",
+  },
+  {
+    question: "Which Bollywood movie is based on the life of the Indian cricketer Mahendra Singh Dhoni",
+    options: ["M.S. Dhoni: The Untold Story", "Sachin:A billion Dreams", "83", "Lagaan"],
+    answer: "M.S. Dhoni: The Untold Story",
+  },
+  {
+    question: "What is the name of the fictional college in the movie 3 Idiots?",
+    options: ["IIT Bombay", " Imperial College of Engineering", "Royal Institute of Engineering", "Pcte"],
+    answer: " Imperial College of Engineering",
+  },
+  {
+    question: "Which movie features the iconic dialogue: Mogambo khush hua?",
+    options: [" Sholay", "Mr. India", "Don", "Avengers"],
+    answer: "Mr. India",
+  },
+  {
+    question: "In which Bollywood movie do we see Ranveer Singh and Deepika Padukone together for the first time?",
+    options: ["Goliyon Ki Raasleela Ram-Leela", "Padmaavat", "Bajirao Mastani", "Tamasha"],
+    answer: "Goliyon Ki Raasleela Ram-Leela",
+  },
+  {
+    question: " Which Bollywood movie is centered around the Indian hockey team's victory in the 1948 Olympics?",
+    options: [" Chak De! India", "Soorma", "Gold", "Hockey"],
+    answer: "Gold",
+  },
+];
+
+// Game state variables
+let currentQuestionIndex = 0;
+let attempts = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+
+// Get elements from the HTML
+const questionText = document.getElementById("question");
+const optionsList = document.getElementById("options");
+const attemptsDisplay = document.getElementById("attempts");
+const correctDisplay = document.getElementById("correct");
+const wrongDisplay = document.getElementById("wrong");
+const crownMessage = document.getElementById("crown");
+const nextButton = document.getElementById("next-btn");
+
+// Function to show the current question
+function showQuestion() {
+  // Get the current question
+  const question = questions[currentQuestionIndex];
+  questionText.textContent = question.question;
+
+  // Clear old options
+  optionsList.innerHTML = "";
+
+  // Show new options
+  question.options.forEach(function (option) {
+    const optionItem = document.createElement("li");
+    optionItem.textContent = option;
+
+    // Add a click event to check the answer
+    optionItem.onclick = function () {
+      checkAnswer(option);
+    };
+
+    optionsList.appendChild(optionItem);
+  });
+
+  // Hide the "Next" button at the start of each question
+  nextButton.style.display = "none";
+}
+
+// Function to check the selected answer
+function checkAnswer(selectedOption) {
+  attempts++;
+  attemptsDisplay.textContent = attempts;
+
+  // Get the correct answer for the current question
+  const correctAnswer = questions[currentQuestionIndex].answer;
+
+  if (selectedOption === correctAnswer) {
+    correctAnswers++;
+    correctDisplay.textContent = correctAnswers;
+  } else {
+    wrongAnswers++;
+    wrongDisplay.textContent = wrongAnswers;
+  }
+
+  // Highlight the correct and wrong answers
+  const options = optionsList.querySelectorAll("li");
+  options.forEach(function (option) {
+    if (option.textContent === correctAnswer) {
+      option.style.backgroundColor = "lightgreen"; // Correct answer
+    } else {
+      option.style.backgroundColor = "salmon"; // Wrong answer
+    }
+    option.onclick = null; // Disable further clicks
+  });
+
+  // Show the "Next" button
+  nextButton.style.display = "inline-block";
+
+  // Check if the user deserves the crown
+  if (correctAnswers === questions.length && attempts === questions.length) {
+    crownMessage.style.display = "block";
+  }
+}
+
+// Function to move to the next question
+function nextQuestion() {
+  currentQuestionIndex++;
+
+  if (currentQuestionIndex < questions.length) {
+    showQuestion();
+  } else {
+    alert("You finished the quiz!");
+  }
+}
+
+// Start the game by showing the first question
+showQuestion();
+  </script>
+</body>
+</html>
